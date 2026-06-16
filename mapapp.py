@@ -25,7 +25,7 @@ roundtrip = st.radio("利用方法", ["往復", "片道"])
 wait = st.number_input("待機時間（分）", 0, 300, 0)
 
 if st.button("概算料金を計算する"):
-    d_home = get_distance("柏の葉キャンパス駅", home)
+    d_home = get_distance("千葉県柏市若柴174", home)
     d_dest = get_distance(home, dest)
 
     if d_home is None or d_dest is None:
