@@ -139,6 +139,68 @@ if st.button("概算料金を計算する"):
     # 結果表示
     st.success("概算料金はこちらです")
 
-    st.metric("駅 → 自宅 距離", f"{d_home:.1f} km")
-    st.metric("自宅 → 目的地 距離", f"{d_dest:.1f} km")
-    st.metric("概算料金", f"{total:,} 円")
+    col1, col2, col3 = st.columns(3)
+
+    # ① 駅 → 自宅
+    with col1:
+        st.subheader("🏠 駅 → 自宅")
+        st.metric("距離", f"{d_home:.1f} km")
+        st.metric("料金", f"{calc_home_price(d_home):,} 円")
+
+        # 内訳
+        if d_home <= 10:
+            st.caption("内訳：10km以内 → 300円")
+        elif d_home <= 15:
+            st.caption("内訳：10〜15km → 500円")
+        else:
+            extra = math.ceil(d_home - 15)
+            st.caption(f"内訳：15km超 → 500円 + {extra}km × 100円")
+
+    # ② 自宅 → 目的地
+    with col2:
+        st.subheader("📍 自宅 → 目的地")
+        st.metric("距離", f"{d_dest:.1f} km")
+
+        dest_price = calc_dest_price(d_dest, roundtrip == "往復")
+        st.metric("料金", f"{dest_price:,} 円")
+
+        # 内訳
+        if roundtrip == "往復":
+            if d_dest <= 3:
+                st.caption("内訳：往復 3km以内 → 2500円")
+            elif d_dest <= 5:
+                st.caption("内訳：往復 5km以内 → 3000円")
+            else:
+                extra = math.ceil(d_dest - 5)
+                st.caption(f"内訳：5km超 → 3000円 + {extra}km × 100円")
+        else:
+            if d_dest <= 3:
+                st.caption("内訳：片道 3km以内 → 2000円")
+            elif d_dest <= 5:
+                st.caption("内訳：片道 5km以内 → 2500円")
+                st.caption("内訳：片道 5km以内 → 2500円")
+            else:
+                extra = math.ceil(d_dest - 5)
+                st.caption(f"内訳：5km超 → 2500円 + {extra}km × 100円")
+
+    # ③ 待機料金
+    with col3:
+        st.subheader("⏱ 待機時間")
+        st.metric("時間", f"{wait} 分")
+    
+        wait_price = calc_wait_price(wait)
+        st.metric("料金", f"{wait_price:,} 円")
+
+        # 内訳
+        if wait <= 30:
+            st.caption("内訳：30分以内 → 0円")
+        elif wait <= 60:
+            st.caption("内訳：30〜60分 → 1000円")
+        elif wait <= 90:
+            st.caption("内訳：60〜90分 → 1500円")
+        elif wait <= 120:
+            st.caption("内訳：90〜120分 → 2000円")
+        else:
+            extra = math.ceil((wait - 120) / 30)
+            st.caption(f"内訳：120分超 → 2000円 + {extra} × 1000円")
+
